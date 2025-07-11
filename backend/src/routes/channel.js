@@ -32,7 +32,6 @@ module.exports = async function (fastify, opts) {
     },
     required: ['id', 'content'],
   })
-  const repo = () => fastify.db.getRepository('Channel');
 
   // Get a channel by id
   fastify.get('/:id', {
@@ -51,7 +50,7 @@ module.exports = async function (fastify, opts) {
       },
     }
   }, async (request, reply) => {
-    const channel = await repo().findOne({ where: { id: request.params.id } });
+    const channel = await fastify.db.channels.findOne({ where: { id: request.params.id } });
     if (!channel) return reply.code(404).send({ error: 'Channel not found' });
     return channel;
   });
@@ -72,8 +71,8 @@ module.exports = async function (fastify, opts) {
       },
     }
   }, async (request, reply) => {
-    const channel = repo().create(request.body);
-    await repo().save(channel);
+    const channel = fastify.db.channels.create(request.body);
+    await fastify.db.channels.save(channel);
     return reply.code(201).send(channel);
   });
 
@@ -94,9 +93,10 @@ module.exports = async function (fastify, opts) {
       },
     }
   }, async (request, reply) => {
-    const channel = await repo().findOne({ where: { id: request.params.id }, relations: ['messages'] });
+    const channel = await fastify.db.channels.findOne({ where: { id: request.params.id } });
     if (!channel) return reply.code(404).send({ error: 'Channel not found' });
-    return channel.messages;
+    const messages = await fastify.db.messages.find({ where: { channelId: channel.id } });
+    return messages;
   });
 
   // Add a message to a channel
@@ -123,12 +123,11 @@ module.exports = async function (fastify, opts) {
       },
     }
   }, async (request, reply) => {
-    const channel = await repo().findOne({ where: { id: request.params.id } });
+    const channel = await fastify.db.channels.findOne({ where: { id: request.params.id } });
     if (!channel) return reply.code(404).send({ error: 'Channel not found' });
 
-    const message = { ...request.body, channelId: channel.id };
-    channel.messages.push(message);
-    await repo().save(channel);
+    const message = fastify.db.messages.create({ ...request.body, channelId: channel.id });
+    await fastify.db.messages.save(message);
     return reply.code(201).send(message);
   });
 
@@ -150,11 +149,12 @@ module.exports = async function (fastify, opts) {
       },
     }
   }, async (request, reply) => {
-    const channel = await repo().findOne({ where: { id: request.params.id } });
+    const channel = await fastify.db.channels.findOne({ where: { id: request.params.id } });
     if (!channel) return reply.code(404).send({ error: 'Channel not found' });
 
-    channel.messages = channel.messages.filter(msg => msg.id !== request.params.messageId);
-    await repo().save(channel);
+    const message = await fastify.db.messages.findOne({ where: { id: request.params.messageId, channelId: channel.id } });
+    if (!message) return reply.code(404).send({ error: 'Message not found' });
+    await fastify.db.messages.remove(message);
     return reply.code(204).send();
   });
 
@@ -175,7 +175,7 @@ module.exports = async function (fastify, opts) {
       },
     }
   }, async (request, reply) => {
-    const result = await repo().delete(request.params.id);
+    const result = await fastify.db.channels.delete(request.params.id);
     if (result.affected === 0) return reply.code(404).send({ error: 'Channel not found' });
     return reply.code(204).send();
   });

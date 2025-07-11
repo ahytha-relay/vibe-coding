@@ -17,10 +17,9 @@
     "fastify": "^5.4.0",
     "fastify-plugin": "^5.0.1",
     "jest": "^30.0.4",
-    "mercurius": "^16.2.0",
     "pino": "^9.7.0",
     "pino-pretty": "^13.0.0",
-    "sqlite3": "^5.1.7",
+    "sql.js": "^1.13.0",
     "typeorm": "^0.3.25"
   }
 }

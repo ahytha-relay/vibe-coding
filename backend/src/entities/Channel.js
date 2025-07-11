@@ -10,7 +10,8 @@ module.exports = new EntitySchema({
       generated: 'uuid',
     },
     channelTemplateId: {
-      type: String,
+      type: 'uuid',
+      nullable: false,
     },
   },
 });

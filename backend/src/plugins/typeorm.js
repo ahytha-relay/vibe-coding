@@ -5,15 +5,20 @@ const Channel = require('../entities/Channel');
 
 async function dbConnector(fastify, options) {
   const dataSource = new DataSource({
-    type: 'sqlite',
-    database: 'db.sqlite',
+    type: 'sqljs',
+    autoSave: true,
+    location: 'db.sqljs',
     synchronize: true,
     logging: false,
     entities: [Message, Channel],
   });
 
   await dataSource.initialize();
-  fastify.decorate('db', dataSource);
+  fastify.decorate('db', {
+    ...dataSource,
+    channels: dataSource.getRepository('Channel'),
+    messages: dataSource.getRepository('Message')
+  });
 
   fastify.addHook('onClose', async (instance, done) => {
     await dataSource.destroy();

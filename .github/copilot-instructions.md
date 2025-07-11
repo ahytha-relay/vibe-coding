@@ -6,6 +6,15 @@ this is a monorepo with multiple projects. The backend project is in the
 directory contains the IaC definitions written in terraform to host the all of
 the projects on AWS infrastructure.
 
+The `channel-ui` project is a React + TypeScript project bootstrapped with Vite.
+It uses material-ui for the UI components and has a custom theme. The project is
+structured with a focus on modularity and reusability, with components organized
+into directories based on their functionality. The project also includes a
+custom theme for consistent styling across the application, and it uses TypeScript
+for type safety and better developer experience. The project is designed to be
+easily extensible, allowing for the addition of new features and components with
+minimal effort.
+
 The `scripts/` directory contains various scripts that are used to manage the
 projects, including build scripts, deployment scripts, and utility scripts.
 

@@ -1,20 +1,20 @@
 const { EntitySchema } = require('typeorm');
-const channel = require('../routes/channel');
 
 module.exports = new EntitySchema({
   name: 'Message',
   tableName: 'messages',
   columns: {
     id: {
-      type: String,
+      type: 'uuid',
       primary: true,
+      generated: 'uuid',
     },
     channelId: {
-      type: String,
+      type: 'uuid',
       nullable: false,
     },
     content: {
-      type: String,
+      type: 'text',
       nullable: false,
     },
   },
