@@ -21,3 +21,5 @@ echo "Starting testing Docker cluster..."
 docker-compose -f "$DOCKER_COMPOSE_FILE" up -d --build
 
 echo "Testing Docker cluster started."
+
+sh "$SCRIPT_DIR/populate-test-channel.sh"

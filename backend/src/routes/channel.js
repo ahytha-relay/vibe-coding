@@ -123,6 +123,7 @@ module.exports = async function (fastify, opts) {
       },
     }
   }, async (request, reply) => {
+    fastify.log.info({ body: request.body }, `Adding message to channel ${request.params.id}`);
     const channel = await fastify.db.channels.findOne({ where: { id: request.params.id } });
     if (!channel) return reply.code(404).send({ error: 'Channel not found' });
 

@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react'
 import { CssBaseline, ThemeProvider, createTheme } from '@mui/material'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 import Message from './components/Message'
 import type { ChannelMessage } from './services/channel'
@@ -9,7 +7,33 @@ import type { ChannelMessage } from './services/channel'
 function App() {
   // channel is identified through the URL
   const channelId = window.location.pathname.split('/').pop() ?? '';
-  const theme = createTheme();
+  const theme = createTheme({
+    palette: {
+      background: {
+        default: '#f5f5f5', // light gray
+      },
+    },
+    components: {
+      MuiCssBaseline: {
+        styleOverrides: {
+          'html, body': {
+            margin: 0,
+            padding: 0,
+            height: '100%',
+          },
+          '#root': {
+            margin: 0,
+            padding: 0,
+            width: '100%',
+            height: '100%',
+            position: 'absolute',
+            top: 0,
+            left: 0
+          }
+        }
+      }
+    }
+  });
   const [messages, setMessages] = useState([] as ChannelMessage[]);
 
   // fetch list of messages for channel
@@ -27,14 +51,6 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
       <h1>Vite + React</h1>
       {messages.map(message => (
         <Message key={message.id} channelId={channelId} messageId={message.id} />

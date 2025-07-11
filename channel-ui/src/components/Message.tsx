@@ -41,9 +41,9 @@ const Message: React.FC<MessageProps> = ({ channelId, messageId }) => {
   if (!message) return null;
 
   return (
-    <Card variant="outlined">
+    <Card variant="outlined" sx={{ borderRadius: '1em', margin: '1em' }}>
       <CardContent>
-        <Typography variant="body1">{message.content}</Typography>
+        <div dangerouslySetInnerHTML={{ __html: message.content }} />
       </CardContent>
     </Card>
   );
