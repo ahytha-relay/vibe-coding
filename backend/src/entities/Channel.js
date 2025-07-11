@@ -14,4 +14,19 @@ module.exports = new EntitySchema({
       nullable: false,
     },
   },
+  relations: {
+    channelTemplate: {
+      type: 'many-to-one',
+      target: 'ChannelTemplate',
+      joinColumn: {
+        name: 'channelTemplateId',
+      },
+      inverseSide: 'channels',
+    },
+    messages: {
+      type: 'one-to-many',
+      target: 'Message',
+      inverseSide: 'channel',
+    },
+  },
 });

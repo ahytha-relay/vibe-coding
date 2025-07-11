@@ -18,4 +18,14 @@ module.exports = new EntitySchema({
       nullable: false,
     },
   },
+  relations: {
+    channel: {
+      type: 'many-to-one',
+      target: 'Channel',
+      joinColumn: {
+        name: 'channelId',
+      },
+      inverseSide: 'messages',
+    },
+  },
 });
