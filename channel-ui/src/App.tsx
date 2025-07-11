@@ -1,15 +1,28 @@
-import { useState } from 'react'
-import { Button, CssBaseline, ThemeProvider, createTheme } from '@mui/material'
+import { useEffect, useState } from 'react'
+import { CssBaseline, ThemeProvider, createTheme } from '@mui/material'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
+import Message from './components/Message'
+import type { ChannelMessage } from './services/channel'
 
 function App() {
-  const [count, setCount] = useState(0)
-  const theme = createTheme();
-
   // channel is identified through the URL
-  const channelId = window.location.pathname.split('/').pop();
+  const channelId = window.location.pathname.split('/').pop() ?? '';
+  const theme = createTheme();
+  const [messages, setMessages] = useState([] as ChannelMessage[]);
+
+  // fetch list of messages for channel
+  useEffect(() => {
+    async function fetchMessages() {
+      const channelId = window.location.pathname.split('/').pop();
+      const res = await fetch(`/api/channel/${channelId}/messages`);
+      if (!res.ok) throw new Error('Failed to fetch messages');
+      const data = await res.json();
+      setMessages(data);
+    }
+    fetchMessages();
+  }, [channelId]);
 
   return (
     <ThemeProvider theme={theme}>
@@ -23,18 +36,9 @@ function App() {
         </a>
       </div>
       <h1>Vite + React</h1>
-      <h1>Channel ID: {channelId}</h1>
-      <div className="card">
-        <Button variant="contained" onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </Button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      {messages.map(message => (
+        <Message key={message.id} channelId={channelId} messageId={message.id} />
+      ))}
     </ThemeProvider>
   )
 }
