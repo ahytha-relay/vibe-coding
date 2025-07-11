@@ -1,6 +1,8 @@
-const fastify = require('fastify')({ logger: true });
+import fs from 'fs';
+import Fastify from 'fastify';
+const fastify = Fastify({ logger: true });
 
-fastify.register(require('@fastify/swagger'), {
+fastify.register(import('@fastify/swagger'), {
   swagger: {
     info: {
       title: 'API Docs',
@@ -13,7 +15,7 @@ fastify.register(require('@fastify/swagger'), {
     produces: ['application/json'],
   },
 });
-fastify.register(require('@fastify/swagger-ui'), {
+fastify.register(import('@fastify/swagger-ui'), {
   routePrefix: '/docs',
   uiConfig: {
     docExpansion: 'full',
@@ -21,16 +23,19 @@ fastify.register(require('@fastify/swagger-ui'), {
   },
 });
 
-fastify.register(require('./plugins/typeorm'));
-fastify.register(require('./plugins/logger'));
-fastify.register(require('./routes/channel'), { prefix: '/channel' });
+fastify.register(import('./plugins/typeorm.js'));
+fastify.register(import('./plugins/logger.js'));
 
 fastify.get('/healthcheck', async (request, reply) => {
   return { status: 'ok' };
 });
+fastify.register(import('./routes/channel.js'), { prefix: '/channel' });
 
 const start = async () => {
   try {
+    await fastify.ready();
+    const docs = fastify.swagger(); // Generate Swagger documentation
+    fs.writeFileSync('src/swagger.json', JSON.stringify(docs, null, 2));
     await fastify.listen({ port: 3000, host: '0.0.0.0' });
     fastify.log.info(`Server listening on http://localhost:3000`);
   } catch (err) {
