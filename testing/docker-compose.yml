@@ -1,0 +1,10 @@
+services:
+  backend:
+    build: ../backend
+    image: vibes-backend:latest
+    ports:
+      - "3000:3000"
+    working_dir: /app
+    environment:
+      NODE_ENV: production
+    restart: unless-stopped
