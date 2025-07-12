@@ -1,9 +1,26 @@
 import { useState, useEffect } from 'react'
-import { CssBaseline, ThemeProvider, createTheme, Box, Tabs, Tab } from '@mui/material'
+import { 
+  CssBaseline, 
+  ThemeProvider, 
+  createTheme, 
+  Box, 
+  Drawer, 
+  List, 
+  ListItem, 
+  ListItemButton, 
+  ListItemIcon, 
+  ListItemText, 
+  Divider
+} from '@mui/material'
+import ListAltIcon from '@mui/icons-material/ListAlt'
+import ChannelsIcon from '@mui/icons-material/DynamicFeed'
 import TemplateEditor from './components/TemplateEditor'
 import ChannelList from './components/ChannelList'
 import type { ChannelTemplate } from './services/template'
 import './App.css'
+
+// Constants for the drawer width
+const DRAWER_WIDTH = 240;
 
 function App() {
   const theme = createTheme({
@@ -40,10 +57,10 @@ function App() {
     }
   });
   const [templates, setTemplates] = useState<ChannelTemplate[]>([]);
-  const [activeTab, setActiveTab] = useState(0);
+  const [activeView, setActiveView] = useState(0);
 
-  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
-    setActiveTab(newValue);
+  const handleNavChange = (index: number) => {
+    setActiveView(index);
   };
 
   // fetch list of templates when component mounts
@@ -61,30 +78,85 @@ function App() {
     fetchTemplates();
   }, []);
 
+  // Navigation items configuration
+  const navItems = [
+    { text: 'Templates', icon: <ListAltIcon /> },
+    { text: 'Active Channels', icon: <ChannelsIcon /> }
+  ];
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <div className="app-container">
-        <header className="app-header">
-          <img src="/src/assets/react.svg" className="app-logo" alt="logo" />
-          <h1>Channel Builder</h1>
-        </header>
-        <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
-          <Tabs value={activeTab} onChange={handleTabChange} aria-label="channel management tabs">
-            <Tab label="Templates" />
-            <Tab label="Active Channels" />
-          </Tabs>
+      <div className="app-container" style={{ flexDirection: 'row' }}>
+        {/* Side Panel Navigation */}
+        <Drawer
+          variant="permanent"
+          sx={{
+            width: DRAWER_WIDTH,
+            flexShrink: 0,
+            '& .MuiDrawer-paper': {
+              width: DRAWER_WIDTH,
+              boxSizing: 'border-box',
+            },
+          }}
+        >
+          <Box sx={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            padding: 2,
+            justifyContent: 'center' 
+          }}>
+            <img src="/src/assets/react.svg" className="app-logo" alt="logo" />
+            <Box component="h3" sx={{ ml: 1 }}>Vibes</Box>
+          </Box>
+          <Divider />
+          <List>
+            {navItems.map((item, index) => (
+              <ListItem key={item.text} disablePadding>
+                <ListItemButton 
+                  selected={activeView === index}
+                  onClick={() => handleNavChange(index)}
+                >
+                  <ListItemIcon>
+                    {item.icon}
+                  </ListItemIcon>
+                  <ListItemText primary={item.text} />
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
+        </Drawer>
+
+        {/* Main Content */}
+        <Box 
+          component="main" 
+          sx={{ 
+            flexGrow: 1, 
+            p: 3,
+            display: 'flex',
+            flexDirection: 'column',
+            height: '100vh',
+            overflow: 'auto'
+          }}
+        >
+          <header className="app-header">
+            <h1>Channel Builder</h1>
+          </header>
+          <Box className="app-content">
+            {activeView === 0 ? (
+              <TemplateEditor templates={templates} />
+            ) : (
+              <ChannelList templates={templates} />
+            )}
+          </Box>
+          <Box 
+            component="footer" 
+            className="app-footer"
+            sx={{ mt: 'auto' }}
+          >
+            © {new Date().getFullYear()} Vibes Platform
+          </Box>
         </Box>
-        <main className="app-content">
-          {activeTab === 0 ? (
-            <TemplateEditor templates={templates} />
-          ) : (
-            <ChannelList templates={templates} />
-          )}
-        </main>
-        <footer className="app-footer">
-          © {new Date().getFullYear()} Vibes Platform
-        </footer>
       </div>
     </ThemeProvider>
   )

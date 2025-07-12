@@ -1,14 +1,12 @@
 #root {
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  margin: 0;
+  padding: 0;
   width: 100%;
-  max-width: 1280px;
+  height: 100%;
 }
 
 .app-container {
   display: flex;
-  flex-direction: column;
   min-height: 100vh;
 }
 
