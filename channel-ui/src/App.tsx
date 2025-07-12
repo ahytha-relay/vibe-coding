@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Box, Container, CssBaseline, ThemeProvider, Typography, createTheme } from '@mui/material'
 import './App.css'
 import Message from './components/Message'
-import type { Channel, ChannelMessage } from './services/channel'
+import type { ChannelMessage } from './services/channel'
 import { getChannel, getChannelMessages } from './services/channel'
 
 function App() {
@@ -36,7 +36,7 @@ function App() {
     }
   });
   const [messages, setMessages] = useState([] as ChannelMessage[]);
-  const [channel, setChannel] = useState<Channel | null>(null);
+  const [channel, setChannel] = useState<Awaited<ReturnType<typeof getChannel>> | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -68,31 +68,47 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Container>
-        <Box sx={{ my: 4 }}>
+      <Container maxWidth={false} disableGutters>
+        <Box>
           {loading ? (
-            <Typography variant="h6">Loading channel...</Typography>
+            <Box sx={{ p: 4 }}>
+              <Typography variant="h6">Loading channel...</Typography>
+            </Box>
           ) : error ? (
-            <Typography color="error">Error: {error.message}</Typography>
+            <Box sx={{ p: 4 }}>
+              <Typography color="error">Error: {error.message}</Typography>
+            </Box>
           ) : (
             <>
-              {channel?.bannerImage || channel?.bannerImage ? (
-                <Box sx={{ textAlign: 'center', mb: 3 }}>
+              {channel?.channelTemplate?.bannerImage ? (
+                <Box 
+                  sx={{ 
+                    width: '100%', 
+                    bgcolor: '#333', // dark gray background
+                    mb: 3,
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    padding: 2
+                  }}
+                >
                   <img 
-                    src={channel.bannerImage || channel.bannerImage || ''} 
-                    alt={'Channel banner'} 
-                    style={{ maxWidth: '100%', maxHeight: '200px' }}
+                    src={channel.channelTemplate?.bannerImage || ''} 
+                    alt={channel.channelTemplate?.name || 'Channel banner'} 
+                    style={{ maxHeight: '200px' }}
                   />
                 </Box>
               ) : (
                 <Typography variant="h4" component="h1" gutterBottom>
-                  {'Channel'}
+                  {channel?.channelTemplate?.name || 'Channel'}
                 </Typography>
               )}
               
-              {messages.map(message => (
-                <Message key={message.id} channelId={channelId} messageId={message.id} />
-              ))}
+              <Box sx={{ px: 4, py: 2 }}>
+                {messages.map(message => (
+                  <Message key={message.id} channelId={channelId} messageId={message.id} />
+                ))}
+              </Box>
             </>
           )}
         </Box>
