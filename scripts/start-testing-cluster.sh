@@ -16,6 +16,7 @@ echo "Testing Docker cluster started."
 
 # Wait for services to be ready
 echo "Waiting for services to be ready..."
+sleep 5;
 MAX_RETRIES=30
 RETRY_INTERVAL=2
 RETRY_COUNT=0

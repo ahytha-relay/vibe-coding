@@ -1,8 +1,15 @@
 // Channel service for API interaction
 
+export interface ChannelTemplate {
+  id: string;
+  name: string;
+  bannerImage?: string;
+}
+
 export interface Channel {
   id: string;
   channelTemplateId: string;
+  bannerImage?: string; // Convenience property from the backend
 }
 
 export interface ChannelMessage {

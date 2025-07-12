@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
-import { CssBaseline, ThemeProvider, createTheme } from '@mui/material'
+import { Box, Container, CssBaseline, ThemeProvider, Typography, createTheme } from '@mui/material'
 import './App.css'
 import Message from './components/Message'
-import type { ChannelMessage } from './services/channel'
+import type { Channel, ChannelMessage } from './services/channel'
+import { getChannel, getChannelMessages } from './services/channel'
 
 function App() {
   // channel is identified through the URL
@@ -35,26 +36,67 @@ function App() {
     }
   });
   const [messages, setMessages] = useState([] as ChannelMessage[]);
+  const [channel, setChannel] = useState<Channel | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
 
-  // fetch list of messages for channel
+  // fetch channel and messages
   useEffect(() => {
-    async function fetchMessages() {
-      const channelId = window.location.pathname.split('/').pop();
-      const res = await fetch(`/api/channel/${channelId}/messages`);
-      if (!res.ok) throw new Error('Failed to fetch messages');
-      const data = await res.json();
-      setMessages(data);
+    async function fetchChannelData() {
+      if (!channelId) return;
+      
+      try {
+        setLoading(true);
+        // Fetch channel data
+        const channelData = await getChannel(channelId);
+        setChannel(channelData);
+        
+        // Fetch messages
+        const messagesData = await getChannelMessages(channelId);
+        setMessages(messagesData);
+      } catch (err) {
+        console.error('Error fetching channel data:', err);
+        setError(err instanceof Error ? err : new Error('Unknown error occurred'));
+      } finally {
+        setLoading(false);
+      }
     }
-    fetchMessages();
+    
+    fetchChannelData();
   }, [channelId]);
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <h1>Vite + React</h1>
-      {messages.map(message => (
-        <Message key={message.id} channelId={channelId} messageId={message.id} />
-      ))}
+      <Container>
+        <Box sx={{ my: 4 }}>
+          {loading ? (
+            <Typography variant="h6">Loading channel...</Typography>
+          ) : error ? (
+            <Typography color="error">Error: {error.message}</Typography>
+          ) : (
+            <>
+              {channel?.bannerImage || channel?.bannerImage ? (
+                <Box sx={{ textAlign: 'center', mb: 3 }}>
+                  <img 
+                    src={channel.bannerImage || channel.bannerImage || ''} 
+                    alt={'Channel banner'} 
+                    style={{ maxWidth: '100%', maxHeight: '200px' }}
+                  />
+                </Box>
+              ) : (
+                <Typography variant="h4" component="h1" gutterBottom>
+                  {'Channel'}
+                </Typography>
+              )}
+              
+              {messages.map(message => (
+                <Message key={message.id} channelId={channelId} messageId={message.id} />
+              ))}
+            </>
+          )}
+        </Box>
+      </Container>
     </ThemeProvider>
   )
 }
