@@ -1,17 +1,12 @@
 #!/bin/bash
 
 # Create test channelTemplate if it doesn't exist
-CHANNEL_TEMPLATE_ID="test-template-id"
-CHANNEL_TEMPLATE_RESPONSE=$(curl -s -X GET http://localhost/api/channel-template/$CHANNEL_TEMPLATE_ID)
-if [ -z "$CHANNEL_TEMPLATE_RESPONSE" ]; then
-  echo "Creating test channel template..."
-  curl -s -X POST http://localhost/api/channel-template/ \
-    -H "Content-Type: application/json" \
-    -d '{"id": "'$CHANNEL_TEMPLATE_ID'", "name": "Test Template", "bannerImage": "https://example.com/banner.jpg"}'
-  echo "Test channel template created."
-else
-  echo "Test channel template already exists."
-fi
+echo "Creating test channel template..."
+CHANNEL_TEMPLATE_RESPONSE=$(curl -s -X POST http://localhost/api/channel/templates \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Test Template", "bannerImage": "https://example.com/banner.jpg"}')
+CHANNEL_TEMPLATE_ID=$(echo $CHANNEL_TEMPLATE_RESPONSE | jq -r '.id')
+echo "Test channel template created."
 
 # Check if channel ID was provided as an argument
 if [ "$1" ]; then
@@ -20,7 +15,6 @@ if [ "$1" ]; then
 else
   # Create a test channel
   echo "Creating test channel..."
-  CHANNEL_TEMPLATE_ID="test-template-id"
   CHANNEL_RESPONSE=$(curl -s -X POST http://localhost/api/channel/ \
     -H "Content-Type: application/json" \
     -d '{"channelTemplateId": "'$CHANNEL_TEMPLATE_ID'"}')
@@ -37,7 +31,7 @@ for MSG in "${MESSAGES[@]}"; do
   echo "Adding message: $CONTENT"
   curl -s -X POST http://localhost/api/channel/$CHANNEL_ID/messages \
     -H "Content-Type: application/json" \
-    -d "{\"content\": \"$CONTENT\"}"
+    -d "{\"content\": \"$CONTENT\"}" > /dev/null
 done
 
 echo "Test channel populated."
