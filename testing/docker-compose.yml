@@ -13,6 +13,7 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - ../channel-ui/dist:/app/channel-ui/dist:ro
+      - ../builder-ui/dist:/app/builder-ui/dist:ro
     depends_on:
       - backend
     restart: unless-stopped

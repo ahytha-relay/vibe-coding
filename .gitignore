@@ -3,3 +3,4 @@
 .DS_Store
 **/db.sqljs
 **/swagger.json
+**/dist/*

@@ -6,15 +6,7 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 DOCKER_COMPOSE_FILE="$SCRIPT_DIR/../testing/docker-compose.yml"
 
-(
-  cd "$SCRIPT_DIR/../channel-ui" || exit 1
-  npm run build
-  if [ $? -ne 0 ]; then
-    echo "Channel UI build failed. Exiting."
-    exit 1
-  fi
-  echo "Channel UI build completed successfully."
-)
+sh "$SCRIPT_DIR/build-ui-projects.sh"
 
 echo "Starting testing Docker cluster..."
 
@@ -29,7 +21,7 @@ RETRY_INTERVAL=2
 RETRY_COUNT=0
 
 while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
-  if curl -s http://localhost/api/health-check > /dev/null 2>&1; then
+  if curl -s http://localhost/api/healthcheck > /dev/null 2>&1; then
     echo "Services are ready!"
     # Now that services are confirmed running, populate the test channel
     echo "Populating test channel..."
@@ -44,4 +36,3 @@ done
 
 echo "Timed out waiting for services to be ready after $((MAX_RETRIES * RETRY_INTERVAL)) seconds."
 echo "Services may still be starting. To populate test data later, run: sh $SCRIPT_DIR/populate-test-channel.sh"
-sh populate-test-channel.sh
