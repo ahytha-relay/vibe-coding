@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node src/index.js | pino-pretty",
     "generate:swagger": "npx fastify swagger -o src/swagger.json",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest --detectOpenHandles",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
   },
   "keywords": [],
   "author": "",
