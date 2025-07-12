@@ -59,6 +59,31 @@ module.exports = async function (fastify, opts) {
     required: ['id', 'content'],
   })
 
+  // Get all channels
+  fastify.get('/', {
+    schema: {
+      description: 'Get all channels',
+      response: {
+        200: { 
+          type: 'array', 
+          items: { $ref: 'Channel#' }
+        },
+      },
+    }
+  }, async (request, reply) => {
+    const channels = await fastify.db.channels.find({
+      relations: ['channelTemplate']
+    });
+    
+    // Include the banner image from the template for each channel
+    const result = channels.map(channel => ({
+      ...channel,
+      bannerImage: channel.channelTemplate ? channel.channelTemplate.bannerImage : null
+    }));
+    
+    return result;
+  });
+
   // Get a channel by id
   fastify.get('/:id', {
     schema: {

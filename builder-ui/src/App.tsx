@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
-import { CssBaseline, ThemeProvider, createTheme } from '@mui/material'
+import { CssBaseline, ThemeProvider, createTheme, Box, Tabs, Tab } from '@mui/material'
 import TemplateEditor from './components/TemplateEditor'
+import ChannelList from './components/ChannelList'
 import type { ChannelTemplate } from './services/template'
 import './App.css'
 
@@ -39,6 +40,11 @@ function App() {
     }
   });
   const [templates, setTemplates] = useState<ChannelTemplate[]>([]);
+  const [activeTab, setActiveTab] = useState(0);
+
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
+    setActiveTab(newValue);
+  };
 
   // fetch list of templates when component mounts
   useEffect(() => {
@@ -61,10 +67,20 @@ function App() {
       <div className="app-container">
         <header className="app-header">
           <img src="/src/assets/react.svg" className="app-logo" alt="logo" />
-          <h1>Channel Template Builder</h1>
+          <h1>Channel Builder</h1>
         </header>
+        <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
+          <Tabs value={activeTab} onChange={handleTabChange} aria-label="channel management tabs">
+            <Tab label="Templates" />
+            <Tab label="Active Channels" />
+          </Tabs>
+        </Box>
         <main className="app-content">
-          <TemplateEditor templates={templates} />
+          {activeTab === 0 ? (
+            <TemplateEditor templates={templates} />
+          ) : (
+            <ChannelList templates={templates} />
+          )}
         </main>
         <footer className="app-footer">
           © {new Date().getFullYear()} Vibes Platform

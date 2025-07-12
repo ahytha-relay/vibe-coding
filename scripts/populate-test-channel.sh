@@ -4,7 +4,7 @@
 echo "Creating test channel template..."
 CHANNEL_TEMPLATE_RESPONSE=$(curl -s -X POST http://localhost/api/channel/templates \
   -H "Content-Type: application/json" \
-  -d '{"name": "Test Template", "bannerImage": "https://example.com/banner.jpg"}')
+  -d '{"name": "Test Template", "bannerImage": "https://emerald-portal-dev.relaystaging.com/assets/relay-logo-full.png"}')
 CHANNEL_TEMPLATE_ID=$(echo $CHANNEL_TEMPLATE_RESPONSE | jq -r '.id')
 echo "Test channel template created."
 
